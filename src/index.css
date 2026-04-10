@@ -247,7 +247,8 @@ body {
 }
 
 /* 콘텐츠 영역 */
-.center-content { flex: 1; overflow: auto; background: var(--bg); }
+.center-content { flex: 1; overflow: auto; background: var(--bg); min-height: 0; }
+.center-content > div[style] { height: 100%; }
 
 /* 탐색기 */
 .explorer-hint {

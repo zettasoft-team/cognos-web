@@ -4,7 +4,7 @@ import { exportExcel, importExcel, exportXml, fetchErd, fetchTree } from '../api
 import { fetchDocument } from '../api/documents.js'
 import TreeExplorer from '../components/TreeExplorer.jsx'
 import PropertiesPanel from '../components/PropertiesPanel.jsx'
-import ERDModal from '../components/ERDModal.jsx'
+import ERDDiagram from '../components/ERDDiagram.jsx'
 import Notification from '../components/Notification.jsx'
 
 const CENTER_TABS = [
@@ -159,7 +159,7 @@ export default function DocumentDetail({ doc, onBack }) {
   /* ── ERD 탭 ── */
   const renderErd = () => {
     if (!erdData) return <div className="explorer-hint">ERD 로딩 중...</div>
-    return <ERDModal erdData={erdData} inline />
+    return <ERDDiagram erdData={erdData} />
   }
 
   return (
