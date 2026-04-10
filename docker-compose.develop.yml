@@ -4,6 +4,7 @@ services:
       context: .
       args:
         VITE_MODE: develop
+        VITE_API_BASE_URL: ""
     ports:
       - "3010:80"
     environment:
