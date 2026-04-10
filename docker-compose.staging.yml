@@ -1,0 +1,14 @@
+services:
+  cognosfm-web:
+    build:
+      context: .
+      args:
+        VITE_MODE: staging
+    ports:
+      - "3010:80"
+    environment:
+      # 스테이징 백엔드 서버 주소로 변경
+      BACKEND_URL: http://host.docker.internal:8087
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
