@@ -7,8 +7,7 @@ services:
     ports:
       - "3010:80"
     environment:
-      # 백엔드 서버 주소로 변경 (같은 호스트면 host.docker.internal 유지)
-      BACKEND_URL: http://host.docker.internal:8080
+      BACKEND_URL: http://host.docker.internal:8087
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped

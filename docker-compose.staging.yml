@@ -7,8 +7,12 @@ services:
     ports:
       - "3010:80"
     environment:
-      # 스테이징 백엔드 서버 주소로 변경
-      BACKEND_URL: http://host.docker.internal:8087
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      # 백엔드 서비스명:포트 (같은 네트워크 내에서 서비스명으로 통신)
+      BACKEND_URL: http://cognosfm-api:8087
+    networks:
+      - cognosfm-net
     restart: unless-stopped
+
+networks:
+  cognosfm-net:
+    external: true
