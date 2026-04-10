@@ -8,7 +8,5 @@ services:
     ports:
       - "3010:80"
     environment:
-      BACKEND_URL: http://host.docker.internal:8087
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      BACKEND_URL: http://172.17.0.1:8087
     restart: unless-stopped
