@@ -8,5 +8,11 @@ services:
     ports:
       - "3010:80"
     environment:
-      BACKEND_URL: http://172.17.0.1:8087
+      BACKEND_URL: http://cognosfm-core:8087
+    networks:
+      - cognos-core_default
     restart: unless-stopped
+
+networks:
+  cognos-core_default:
+    external: true
