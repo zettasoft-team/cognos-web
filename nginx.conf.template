@@ -3,6 +3,9 @@ server {
     root /usr/share/nginx/html;
     index index.html;
 
+    # 파일 크기 제한
+    client_max_body_size 0; #제한 없음
+
     # SPA 라우팅
     location / {
         try_files $uri $uri/ /index.html;
