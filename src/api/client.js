@@ -14,6 +14,7 @@ async function request(path, options = {}) {
 export async function get(path)            { return request(path) }
 export async function post(path, body)     { return request(path, { method: 'POST',   headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }) }
 export async function put(path, body)      { return request(path, { method: 'PUT',    headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }) }
+export async function patch(path, body)    { return request(path, { method: 'PATCH',  headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }) }
 export async function del(path, body)      { return request(path, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }) }
 
 // 파일 다운로드 (Blob 반환)

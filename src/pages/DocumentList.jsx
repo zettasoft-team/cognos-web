@@ -1,21 +1,64 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
-import { fetchDocuments, uploadDocument, deleteDocuments } from '../api/documents.js'
+import { fetchDocuments, deleteDocuments, patchDocument } from '../api/documents.js'
 import Notification from '../components/Notification.jsx'
 
 const PAGE_SIZE = 10
 
+/* ── 인라인 설명 편집 셀 ────────────────────────────────────── */
+function DescriptionCell({ docId, value, onSaved }) {
+  const [editing, setEditing] = useState(false)
+  const [draft,   setDraft]   = useState(value)
+  const inputRef = useRef(null)
+
+  useEffect(() => { setDraft(value) }, [value])
+  useEffect(() => { if (editing) inputRef.current?.focus() }, [editing])
+
+  const save = async () => {
+    setEditing(false)
+    if (draft === value) return
+    try { await patchDocument(docId, { description: draft }); onSaved(docId, draft) }
+    catch  { setDraft(value) }
+  }
+
+  if (editing) {
+    return (
+      <input
+        ref={inputRef}
+        className="desc-input"
+        value={draft}
+        onChange={e => setDraft(e.target.value)}
+        onBlur={save}
+        onKeyDown={e => {
+          if (e.key === 'Enter') save()
+          if (e.key === 'Escape') { setDraft(value); setEditing(false) }
+        }}
+        onClick={e => e.stopPropagation()}
+      />
+    )
+  }
+  return (
+    <div
+      className="desc-cell"
+      title="클릭하여 수정"
+      onClick={e => { e.stopPropagation(); setEditing(true) }}
+    >
+      {draft || <span className="desc-placeholder">설명 입력…</span>}
+    </div>
+  )
+}
+
+/* ── 메인 컴포넌트 ──────────────────────────────────────────── */
 export default function DocumentList({ onOpen }) {
-  const [docs, setDocs]         = useState([])
+  const [docs, setDocs]             = useState([])
   const [totalPages, setTotalPages] = useState(1)
-  const [checked, setChecked]   = useState(new Set())
-  const [page, setPage]         = useState(1)
-  const [loading, setLoading]   = useState(false)
-  const [notif, setNotif]       = useState(null)
+  const [checked, setChecked]       = useState(new Set())
+  const [page, setPage]             = useState(1)
+  const [loading, setLoading]       = useState(false)
+  const [notif, setNotif]           = useState(null)
   const fileRef = useRef(null)
 
   const notify = useCallback((msg) => setNotif(msg), [])
 
-  /* 목록 조회 */
   const loadDocs = useCallback(async (p = 1) => {
     setLoading(true)
     try {
@@ -29,7 +72,9 @@ export default function DocumentList({ onOpen }) {
     }
   }, [notify])
 
-  useEffect(() => { loadDocs(page) }, [page])
+  useEffect(() => {
+    loadDocs(page)
+  }, [page])
 
   /* 업로드 */
   const handleUpload = async (e) => {
@@ -39,40 +84,26 @@ export default function DocumentList({ onOpen }) {
     try {
       const form = new FormData()
       files.forEach(f => form.append('files', f))
-      await fetch(`${import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000'}/api/documents`, {
-        method: 'POST',
-        body: form,
-      }).then(r => r.json())
+      await fetch(
+        `${import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000'}/api/documents`,
+        { method: 'POST', body: form }
+      ).then(r => r.json())
       notify(`${files.length}개 파일 업로드 완료`)
-      setPage(1)
-      await loadDocs(1)
-    } catch (e) {
-      notify(`업로드 실패: ${e.message}`)
-    }
+      setPage(1); await loadDocs(1)
+    } catch (e) { notify(`업로드 실패: ${e.message}`) }
   }
 
-  /* 체크박스 - 현재 페이지 기준 */
-  const toggleOne = (id) => {
-    setChecked(prev => {
-      const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      return next
-    })
-  }
-
+  /* 체크박스 */
+  const toggleOne = (id) => setChecked(prev => {
+    const next = new Set(prev)
+    next.has(id) ? next.delete(id) : next.add(id)
+    return next
+  })
   const toggleAll = (e) => {
-    if (e.target.checked) {
-      setChecked(prev => new Set([...prev, ...docs.map(d => d.id)]))
-    } else {
-      setChecked(prev => {
-        const next = new Set(prev)
-        docs.forEach(d => next.delete(d.id))
-        return next
-      })
-    }
+    if (e.target.checked) setChecked(prev => new Set([...prev, ...docs.map(d => d.uuid)]))
+    else setChecked(prev => { const n = new Set(prev); docs.forEach(d => n.delete(d.uuid)); return n })
   }
-
-  const allChecked  = docs.length > 0 && docs.every(d => checked.has(d.id))
+  const allChecked  = docs.length > 0 && docs.every(d => checked.has(d.uuid))
   const someChecked = checked.size > 0
 
   /* 선택 삭제 */
@@ -80,16 +111,28 @@ export default function DocumentList({ onOpen }) {
     if (!window.confirm(`선택한 ${checked.size}개 문서를 삭제하시겠습니까?`)) return
     try {
       await deleteDocuments([...checked])
-      setChecked(new Set())
-      setPage(1)
-      await loadDocs(1)
+      setChecked(new Set()); setPage(1); await loadDocs(1)
       notify('삭제 완료')
-    } catch (e) {
-      notify(`삭제 실패: ${e.message}`)
-    }
+    } catch (e) { notify(`삭제 실패: ${e.message}`) }
   }
 
-  /* 페이지 이동 */
+  /* 단건 삭제 */
+  const handleDeleteOne = async (e, doc) => {
+    e.stopPropagation()
+    if (!window.confirm(`"​${doc.origin_file_name}"​를 삭제하시겠습니까?`)) return
+    try {
+      await deleteDocuments([doc.uuid])
+      setChecked(prev => { const n = new Set(prev); n.delete(doc.uuid); return n })
+      await loadDocs(page)
+      notify('삭제 완료')
+    } catch (e) { notify(`삭제 실패: ${e.message}`) }
+  }
+
+  /* 설명 저장 콜백 */
+  const handleDescSaved = (docUuid, newDesc) => {
+    setDocs(prev => prev.map(d => d.uuid === docUuid ? { ...d, description: newDesc } : d))
+  }
+
   const goPrev = () => setPage(p => Math.max(1, p - 1))
   const goNext = () => setPage(p => Math.min(totalPages, p + 1))
 
@@ -105,6 +148,13 @@ export default function DocumentList({ onOpen }) {
             <div className="page-subtitle">XML 업로드 · 테이블 편집 · XML 재생성 · ERD 시각화</div>
           </div>
           <div className="page-header-actions">
+            <button
+              className="btn btn-delete-selected btn-sm"
+              disabled={!someChecked}
+              onClick={handleDeleteSelected}
+            >
+              선택 삭제{someChecked ? ` (${checked.size})` : ''}
+            </button>
             <button className="btn btn-primary" onClick={() => fileRef.current.click()}>
               + XML 업로드
             </button>
@@ -113,18 +163,24 @@ export default function DocumentList({ onOpen }) {
         </div>
       </div>
 
-      {/* 목록 */}
+      {/* 목록 테이블 */}
       <div className="doc-list-container">
-        <div className="doc-list-header">
+
+        {/* 헤더열 */}
+        <div className="doc-list-header doc-list-header-v2">
           <span className="col-check">
             <input type="checkbox" checked={allChecked} onChange={toggleAll} />
           </span>
-          <span>파일명</span>
-          <span>업로드 일시</span>
+          <span className="col-seq">#</span>
+          <span className="col-proj">Project</span>
+          <span className="col-file">File</span>
+          <span className="col-desc">Description</span>
+          <span className="col-date">Upload</span>
+          <span className="col-actions"></span>
         </div>
 
         {loading ? (
-          <div className="empty-state"><div className="empty-title">불러오는 중...</div></div>
+          <div className="empty-state"><div className="empty-title">불러오는 중…</div></div>
         ) : docs.length === 0 ? (
           <div className="empty-state">
             <div className="empty-title">업로드된 문서가 없습니다</div>
@@ -133,35 +189,55 @@ export default function DocumentList({ onOpen }) {
         ) : (
           docs.map(doc => (
             <div
-              key={doc.id}
-              className={`doc-list-row${checked.has(doc.id) ? ' row-checked' : ''}`}
+              key={doc.uuid}
+              className={`doc-list-row doc-list-row-v2${checked.has(doc.uuid) ? ' row-checked' : ''}`}
             >
               <span className="col-check" onClick={e => e.stopPropagation()}>
                 <input
                   type="checkbox"
-                  checked={checked.has(doc.id)}
-                  onChange={() => toggleOne(doc.id)}
+                  checked={checked.has(doc.uuid)}
+                  onChange={() => toggleOne(doc.uuid)}
                 />
               </span>
-              <div className="doc-filename" onClick={() => onOpen(doc)}>
-                {doc.name}
-              </div>
-              <div className="doc-date">{doc.upload_date}</div>
+
+              <span className="col-seq col-mono">{(page - 1) * PAGE_SIZE + docs.indexOf(doc) + 1}</span>
+
+              <span className="col-proj">
+                {doc.project_name
+                  ? <span className="proj-name">{doc.project_name}</span>
+                  : <span className="col-empty">—</span>}
+              </span>
+
+              <span
+                className="col-file"
+                onClick={() => onOpen(doc)}
+                title={doc.origin_file_name}
+              >
+                {doc.origin_file_name}
+              </span>
+
+              <span className="col-desc">
+                <DescriptionCell
+                  docId={doc.uuid}
+                  value={doc.description ?? ''}
+                  onSaved={handleDescSaved}
+                />
+              </span>
+
+              <span className="col-date col-mono">{doc.upload_date}</span>
+
+              <span className="col-actions" onClick={e => e.stopPropagation()}>
+                <button className="row-btn-open" onClick={() => onOpen(doc)}>열기</button>
+                <button className="row-btn-del"  onClick={e => handleDeleteOne(e, doc)}>삭제</button>
+              </span>
             </div>
           ))
         )}
       </div>
 
-      {/* 하단: 선택 삭제 + 페이징 */}
+      {/* 하단: 페이징 */}
       <div className="list-footer">
-        <button
-          className="btn btn-delete-selected"
-          disabled={!someChecked}
-          onClick={handleDeleteSelected}
-        >
-          선택 삭제{someChecked ? ` (${checked.size})` : ''}
-        </button>
-
+        <span className="total-count">총 {docs.length}개</span>
         <div className="pagination">
           <button className="page-btn" onClick={goPrev} disabled={page === 1}>&lt;</button>
           <span className="page-info">{page} / {totalPages}</span>
@@ -171,3 +247,4 @@ export default function DocumentList({ onOpen }) {
     </div>
   )
 }
+

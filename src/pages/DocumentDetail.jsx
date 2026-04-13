@@ -29,7 +29,7 @@ export default function DocumentDetail({ doc, onBack }) {
 
   useEffect(() => {
     setLoading(true)
-    Promise.all([fetchDocument(doc.id), fetchAllSheets(doc.id), fetchTree(doc.id)])
+    Promise.all([fetchDocument(doc.uuid), fetchAllSheets(doc.uuid), fetchTree(doc.uuid)])
       .then(([meta, sheets, treeData]) => {
         setDocMeta(meta)
         setTableData(sheets)
@@ -37,16 +37,16 @@ export default function DocumentDetail({ doc, onBack }) {
       })
       .catch(e => notify(`로드 실패: ${e.message}`))
       .finally(() => setLoading(false))
-  }, [doc.id])
+  }, [doc.uuid])
 
   useEffect(() => {
     if (centerTab === 'erd' && !erdData) {
-      fetchErd(doc.id).then(setErdData).catch(e => notify(`ERD 로드 실패: ${e.message}`))
+      fetchErd(doc.uuid).then(setErdData).catch(e => notify(`ERD 로드 실패: ${e.message}`))
     }
   }, [centerTab])
 
   const handleExcelDown = async () => {
-    try { await exportExcel(doc.id); notify('Excel 다운로드 완료') }
+    try { await exportExcel(doc.uuid); notify('Excel 다운로드 완료') }
     catch (e) { notify(`다운로드 실패: ${e.message}`) }
   }
 
@@ -55,15 +55,15 @@ export default function DocumentDetail({ doc, onBack }) {
     if (!file) return
     e.target.value = ''
     try {
-      await importExcel(doc.id, file)
-      const [sheets, treeData] = await Promise.all([fetchAllSheets(doc.id), fetchTree(doc.id)])
+      await importExcel(doc.uuid, file)
+      const [sheets, treeData] = await Promise.all([fetchAllSheets(doc.uuid), fetchTree(doc.uuid)])
       setTableData(sheets); setTree(treeData)
       notify('Excel 업로드 완료')
     } catch (e) { notify(`업로드 실패: ${e.message}`) }
   }
 
   const handleXmlGen = async () => {
-    try { await exportXml(doc.id); notify('Cognos XML 재생성 완료') }
+    try { await exportXml(doc.uuid); notify('Cognos XML 재생성 완료') }
     catch (e) { notify(`재생성 실패: ${e.message}`) }
   }
 
@@ -171,7 +171,7 @@ export default function DocumentDetail({ doc, onBack }) {
         <div className="detail-header-left">
           <button className="d-btn-back" onClick={onBack}>← 목록</button>
           <div>
-            <div className="detail-title">{docMeta.name}</div>
+            <div className="detail-title">{docMeta.origin_file_name}</div>
             <div className="detail-subtitle">
               업로드: {docMeta.upload_date}
               {saving && <span className="saving-indicator">저장 중...</span>}
