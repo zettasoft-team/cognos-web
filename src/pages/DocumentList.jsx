@@ -224,7 +224,7 @@ export default function DocumentList({ onOpen }) {
                 />
               </span>
 
-              <span className="col-date col-mono">{doc.upload_date}</span>
+              <span className="col-date col-mono">{doc.upload_date.slice(0, 10)}</span>
 
               <span className="col-actions" onClick={e => e.stopPropagation()}>
                 <button className="row-btn-open" onClick={() => onOpen(doc)}>열기</button>

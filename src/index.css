@@ -93,7 +93,7 @@ body {
 .doc-list-header-v2,
 .doc-list-row-v2 {
   display: grid;
-  grid-template-columns: 44px 40px 130px minmax(140px,180px) 1fr 100px 126px;
+  grid-template-columns: 44px 40px 130px minmax(140px,180px) 1fr 90px 126px;
   column-gap: 10px;
   align-items: center;
   padding: 0 16px;
