@@ -225,6 +225,31 @@ body {
 }
 .tree-label { overflow: hidden; text-overflow: ellipsis; }
 
+/* section 노드 (데이터 소스 / 매개변수 맵 / 패키지) */
+.tree-node-section {
+  margin-top: 4px;
+  border-top: 1px solid var(--border);
+  background: var(--surface-3);
+}
+.tree-node-section:hover { background: #ebebeb; }
+.tree-label-section {
+  font-size: 11px; font-weight: 600;
+  color: var(--text-3); letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* 관계 건수 배지 */
+.tree-rel-badge {
+  margin-left: auto;
+  font-size: 10px; color: var(--text-5);
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0 5px;
+  flex-shrink: 0;
+  line-height: 16px;
+}
+
 /* 중앙 패널 */
 .detail-center {
   flex: 1; display: flex; flex-direction: column; overflow: hidden;

@@ -21,9 +21,9 @@ function renderProps(node) {
   add('상태',   node.status)
   add('데이터타입', node.datatype)
   add('용도',   node.usage)
+  add('외부명', node.externalName)
   add('PK',     node.pk)
   add('NULL허용', node.nullable)
-  add('물리명', node.physical)
   add('집계방식', node.aggregate)
   add('표현식', node.expression)
   add('참조객체', node.refobj)
@@ -31,6 +31,11 @@ function renderProps(node) {
   add('Right',  node.right)
   add('Left 카디널리티',  node.leftCard)
   add('Right 카디널리티', node.rightCard)
+  // 새 타입 props
+  add('쿼리 타입',     node.queryType)
+  add('숨김 여부',     node.hidden)
+  add('발행 경로',     node.publishPath)
+  add('단축 대상 유형', node.shortcutTarget)
 
   return rows
 }
