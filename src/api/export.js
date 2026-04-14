@@ -27,6 +27,12 @@ export const exportXml = async (docId) => {
   triggerDownload(blob, filename)
 }
 
+/** 원본 XML 다운로드 */
+export const exportOriginXml = async (docId) => {
+  const { blob, filename } = await download(`/api/documents/${docId}/export/origin`)
+  triggerDownload(blob, filename)
+}
+
 function triggerDownload(blob, filename) {
   const url = URL.createObjectURL(blob)
   const a   = document.createElement('a')

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { fetchAllSheets } from '../api/sheets.js'
-import { exportExcel, importExcel, exportXml, fetchErd, fetchTree } from '../api/export.js'
+import { exportExcel, importExcel, exportXml, exportOriginXml, fetchErd, fetchTree } from '../api/export.js'
 import { fetchDocument } from '../api/documents.js'
 import TreeExplorer from '../components/TreeExplorer.jsx'
 import PropertiesPanel from '../components/PropertiesPanel.jsx'
@@ -62,9 +62,9 @@ export default function DocumentDetail({ doc, onBack }) {
     } catch (e) { notify(`업로드 실패: ${e.message}`) }
   }
 
-  const handleXmlGen = async () => {
-    try { await exportXml(doc.uuid); notify('Cognos XML 재생성 완료') }
-    catch (e) { notify(`재생성 실패: ${e.message}`) }
+  const handleXmlDown = async () => {
+    try { await exportOriginXml(doc.uuid); notify('XML 다운로드 완료') }
+    catch (e) { notify(`다운로드 실패: ${e.message}`) }
   }
 
   /* ── 탐색기 탭 ── */
@@ -182,7 +182,7 @@ export default function DocumentDetail({ doc, onBack }) {
           <button className="d-btn-outline" onClick={handleExcelDown}>Excel 다운로드</button>
           <button className="d-btn-outline" onClick={() => xlsxRef.current.click()}>Excel 업로드</button>
           <input type="file" ref={xlsxRef} accept=".xlsx,.xls" onChange={handleExcelUp} />
-          <button className="d-btn-primary" onClick={handleXmlGen}>Cognos XML 재생성</button>
+          <button className="d-btn-outline" onClick={handleXmlDown}>XML 다운로드</button>
         </div>
       </div>
 

@@ -22,8 +22,10 @@ export async function download(path) {
   const res = await fetch(`${BASE_URL}${path}`)
   if (!res.ok) throw new Error('다운로드 실패')
   const disposition = res.headers.get('Content-Disposition') ?? ''
-  const match = disposition.match(/filename="(.+?)"/)
-  const filename = match ? match[1] : 'download'
+  // filename*=UTF-8''... 우선, fallback으로 filename="..."
+  const utf8Match = disposition.match(/filename\*=UTF-8''(.+?)(?:;|$)/)
+  const plainMatch = disposition.match(/filename="(.+?)"/)
+  const filename = utf8Match ? decodeURIComponent(utf8Match[1]) : plainMatch ? plainMatch[1] : 'download'
   const blob = await res.blob()
   return { blob, filename }
 }
