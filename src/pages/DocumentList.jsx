@@ -55,6 +55,7 @@ export default function DocumentList({ onOpen }) {
   const [page, setPage]             = useState(1)
   const [loading, setLoading]       = useState(false)
   const [notif, setNotif]           = useState(null)
+  const [query, setQuery]           = useState('')
   const fileRef = useRef(null)
 
   const notify = useCallback((msg) => setNotif(msg), [])
@@ -148,18 +149,30 @@ export default function DocumentList({ onOpen }) {
             <div className="page-subtitle">XML 업로드 · 테이블 편집 · XML 재생성 · ERD 시각화</div>
           </div>
           <div className="page-header-actions">
-            <button
-              className="btn btn-delete-selected btn-sm"
-              disabled={!someChecked}
-              onClick={handleDeleteSelected}
-            >
-              선택 삭제{someChecked ? ` (${checked.size})` : ''}
-            </button>
             <button className="btn btn-primary" onClick={() => fileRef.current.click()}>
               + XML 업로드
             </button>
             <input type="file" ref={fileRef} accept=".xml" multiple onChange={handleUpload} />
           </div>
+        </div>
+      </div>
+
+      {/* 검색 행: 좌측 총개수, 우측 검색 박스 */}
+      <div className="doc-search-row">
+        <span className="doc-total-count">총 {docs.length}개</span>
+        <div className="doc-search">
+          <svg className="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+          </svg>
+          <input
+            type="text"
+            placeholder="파일명, 프로젝트명 또는 설명으로 검색"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+          />
+          {query && (
+            <button type="button" className="doc-search-clear" onClick={() => setQuery('')} aria-label="초기화">×</button>
+          )}
         </div>
       </div>
 
@@ -179,15 +192,28 @@ export default function DocumentList({ onOpen }) {
           <span className="col-actions"></span>
         </div>
 
-        {loading ? (
-          <div className="empty-state"><div className="empty-title">불러오는 중…</div></div>
-        ) : docs.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-title">업로드된 문서가 없습니다</div>
-            <div>XML 파일을 업로드하면 목록에 표시됩니다.</div>
-          </div>
-        ) : (
-          docs.map(doc => (
+        {(() => {
+          const q = query.trim().toLowerCase()
+          const filtered = q
+            ? docs.filter(d =>
+                (d.origin_file_name || '').toLowerCase().includes(q) ||
+                (d.project_name || '').toLowerCase().includes(q) ||
+                (d.description || '').toLowerCase().includes(q))
+            : docs
+          if (loading) return <div className="empty-state"><div className="empty-title">불러오는 중…</div></div>
+          if (docs.length === 0) return (
+            <div className="empty-state">
+              <div className="empty-title">업로드된 문서가 없습니다</div>
+              <div>XML 파일을 업로드하면 목록에 표시됩니다.</div>
+            </div>
+          )
+          if (filtered.length === 0) return (
+            <div className="empty-state">
+              <div className="empty-title">검색 결과가 없습니다</div>
+              <div>다른 키워드로 검색해보세요.</div>
+            </div>
+          )
+          return filtered.map(doc => (
             <div
               key={doc.uuid}
               className={`doc-list-row doc-list-row-v2${checked.has(doc.uuid) ? ' row-checked' : ''}`}
@@ -232,12 +258,18 @@ export default function DocumentList({ onOpen }) {
               </span>
             </div>
           ))
-        )}
+        })()}
       </div>
 
-      {/* 하단: 페이징 */}
+      {/* 하단: 선택 삭제 + 페이징 */}
       <div className="list-footer">
-        <span className="total-count">총 {docs.length}개</span>
+        <button
+          className="btn btn-secondary btn-delete-selected"
+          onClick={handleDeleteSelected}
+          disabled={!someChecked}
+        >
+          선택 삭제{someChecked ? ` (${checked.size})` : ''}
+        </button>
         <div className="pagination">
           <button className="page-btn" onClick={goPrev} disabled={page === 1}>&lt;</button>
           <span className="page-info">{page} / {totalPages}</span>

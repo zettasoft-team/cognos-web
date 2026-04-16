@@ -79,6 +79,57 @@ body {
 .page-subtitle { font-size: 12px; color: var(--text-4); margin-top: 4px; }
 .page-header-actions { display: flex; gap: 8px; flex-shrink: 0; align-items: center; }
 
+/* ── 검색 행 (목록 위 단독 행) ── */
+.doc-search-row {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.doc-total-count {
+  font-size: 13px;
+  color: var(--text-3);
+  font-weight: 500;
+}
+.doc-search {
+  position: relative;
+  display: flex; align-items: center;
+  background: #fff;
+  border: 1px solid var(--border-2);
+  border-radius: 8px;
+  height: 36px;
+  max-width: 320px;
+  padding: 0 10px 0 34px;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+.doc-search:focus-within {
+  border-color: #111;
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
+}
+.doc-search .icon {
+  position: absolute;
+  left: 10px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-4);
+  pointer-events: none;
+}
+.doc-search input {
+  flex: 1; min-width: 0;
+  border: none; outline: none; background: transparent;
+  font-family: var(--sans); font-size: 13px;
+  color: var(--text-1);
+  height: 100%;
+}
+.doc-search input::placeholder { color: var(--text-4); }
+.doc-search-clear {
+  background: transparent; border: none; cursor: pointer;
+  color: var(--text-4); font-size: 18px; line-height: 1;
+  width: 24px; height: 24px; border-radius: 4px;
+  display: grid; place-items: center;
+}
+.doc-search-clear:hover { background: var(--surface-3); color: var(--text-2); }
+
 /* ── 문서 목록 ── */
 /* v2 컨테이너 */
 .doc-list-container {
@@ -225,6 +276,22 @@ body {
   display: flex; align-items: center; justify-content: space-between;
 }
 .total-count { font-size: 12px; color: var(--text-4); }
+.btn-delete-selected {
+  height: 32px;
+  font-size: 13px;
+}
+.btn-delete-selected:not(:disabled) {
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+.btn-delete-selected:not(:disabled):hover {
+  background: #fef2f2;
+}
+.btn-delete-selected:disabled {
+  color: var(--text-5);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
 
 /* 빈 상태 */
 .empty-state { text-align: center; padding: 56px 20px; color: var(--text-4); }

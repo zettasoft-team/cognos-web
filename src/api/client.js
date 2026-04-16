@@ -1,6 +1,16 @@
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000'
 
+/** auth.js 에서 토큰을 가져오기 위한 lazy import (순환 참조 방지) */
+function _getToken() {
+  try { return window.__cognosfm_access_token } catch { return null }
+}
+
 async function request(path, options = {}) {
+  const token = _getToken()
+  if (token) {
+    options.headers = { ...options.headers, Authorization: `Bearer ${token}` }
+  }
+  options.credentials = 'include' // refresh 쿠키 전송
   const res = await fetch(`${BASE_URL}${path}`, options)
   if (!res.ok) {
     const detail = await res.json().catch(() => ({ detail: res.statusText }))
