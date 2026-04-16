@@ -10,10 +10,17 @@ export const fetchDocuments = (page = 1, size = 10) =>
 export const fetchDocument = (docId) =>
   get(`/api/documents/${docId}`)
 
-/** XML 업로드 */
+/** XML 업로드 (단일) */
 export const uploadDocument = (file) => {
   const form = new FormData()
   form.append('file', file)
+  return upload('/api/documents', form)
+}
+
+/** XML 업로드 (다중) */
+export const uploadDocuments = (files) => {
+  const form = new FormData()
+  files.forEach(f => form.append('files', f))
   return upload('/api/documents', form)
 }
 

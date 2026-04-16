@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
-import { fetchDocuments, deleteDocuments, patchDocument } from '../api/documents.js'
+import { fetchDocuments, deleteDocuments, patchDocument, uploadDocuments } from '../api/documents.js'
 import Notification from '../components/Notification.jsx'
 
 const PAGE_SIZE = 10
@@ -83,12 +83,7 @@ export default function DocumentList({ onOpen }) {
     if (!files.length) return
     e.target.value = ''
     try {
-      const form = new FormData()
-      files.forEach(f => form.append('files', f))
-      await fetch(
-        `${import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000'}/api/documents`,
-        { method: 'POST', body: form }
-      ).then(r => r.json())
+      await uploadDocuments(files)
       notify(`${files.length}개 파일 업로드 완료`)
       setPage(1); await loadDocs(1)
     } catch (e) { notify(`업로드 실패: ${e.message}`) }

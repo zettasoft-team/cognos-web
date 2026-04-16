@@ -29,7 +29,10 @@ export async function del(path, body)      { return request(path, { method: 'DEL
 
 // 파일 다운로드 (Blob 반환)
 export async function download(path) {
-  const res = await fetch(`${BASE_URL}${path}`)
+  const token = _getToken()
+  const headers = {}
+  if (token) headers.Authorization = `Bearer ${token}`
+  const res = await fetch(`${BASE_URL}${path}`, { headers, credentials: 'include' })
   if (!res.ok) throw new Error('다운로드 실패')
   const disposition = res.headers.get('Content-Disposition') ?? ''
   // filename*=UTF-8''... 우선, fallback으로 filename="..."
@@ -42,7 +45,10 @@ export async function download(path) {
 
 // multipart/form-data 업로드
 export async function upload(path, formData) {
-  const res = await fetch(`${BASE_URL}${path}`, { method: 'POST', body: formData })
+  const token = _getToken()
+  const headers = {}
+  if (token) headers.Authorization = `Bearer ${token}`
+  const res = await fetch(`${BASE_URL}${path}`, { method: 'POST', headers, credentials: 'include', body: formData })
   if (!res.ok) {
     const detail = await res.json().catch(() => ({ detail: res.statusText }))
     throw new Error(detail.detail ?? '업로드 실패')
