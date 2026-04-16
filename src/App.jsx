@@ -5,7 +5,7 @@ import Models       from './pages/Models.jsx'
 import ReportsAdmin from './pages/ReportsAdmin.jsx'
 import Requests     from './pages/Requests.jsx'
 import Admin        from './pages/Admin.jsx'
-import { logout, fetchMe, setAccessToken, clearAccessToken } from './api/auth.js'
+import { logout, fetchMe, refreshToken, clearAccessToken } from './api/auth.js'
 
 const screens = {
   models:   Models,
@@ -14,18 +14,33 @@ const screens = {
   admin:    Admin,
 }
 
+function getPageFromHash() {
+  const h = location.hash.replace('#', '')
+  return screens[h] ? h : 'models'
+}
+
 function App() {
   const [user, setUser] = useState(null)
-  const [page, setPage] = useState('models')
+  const [page, setPage] = useState(getPageFromHash)
   const [checking, setChecking] = useState(true)
 
   // 새로고침 시 refresh 쿠키로 세션 복구 시도
   useEffect(() => {
-    fetchMe()
-      .then(u => { setUser(u); setAccessToken(window.__cognosfm_access_token) })
+    refreshToken()
+      .then(() => fetchMe())
+      .then(u => setUser(u))
       .catch(() => clearAccessToken())
       .finally(() => setChecking(false))
   }, [])
+
+  // hash ↔ page 동기화
+  useEffect(() => {
+    const onHash = () => setPage(getPageFromHash())
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
+  }, [])
+
+  const navigate = (p) => { location.hash = p }
 
   const handleLogin = (u) => {
     setUser(u)
@@ -35,7 +50,7 @@ function App() {
     await logout()
     clearAccessToken()
     setUser(null)
-    setPage('models')
+    navigate('models')
   }
 
   if (checking) return null
@@ -48,7 +63,7 @@ function App() {
   return (
     <Shell
       current={page}
-      onNavigate={setPage}
+      onNavigate={navigate}
       onLogout={handleLogout}
       user={user}
     >
