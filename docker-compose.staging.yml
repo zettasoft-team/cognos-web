@@ -1,19 +1,19 @@
 services:
-  cognosfm-web:
+  zmeta-web:
     build:
       context: .
       args:
         VITE_MODE: staging
         VITE_API_BASE_URL: ""
-    container_name: cognosfm-web
+    container_name: zmeta-web
     ports:
       - "3010:80"
     environment:
-      BACKEND_URL: http://cognosfm-core:8087
+      BACKEND_URL: http://zmeta-core:8087
     networks:
-      - cognosfm-net
+      - zmeta-net
     restart: unless-stopped
 
 networks:
-  cognosfm-net:
+  zmeta-net:
     external: true
