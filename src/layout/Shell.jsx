@@ -37,8 +37,8 @@ export default function Shell({ current, onNavigate, onLogout, user, children })
             ) : (
               /* 펼친 상태: 로고 + 타이틀 + 접기 버튼 */
               <>
-                <div className="sidebar-logo">C</div>
-                <div>CognosFM</div>
+                <div className="sidebar-logo">Z</div>
+                <div>Zmeta</div>
                 <button
                   className="sidebar-toggle"
                   onClick={() => setCollapsed(true)}

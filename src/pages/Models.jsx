@@ -2,7 +2,7 @@ import { useState } from 'react'
 import DocumentList from './DocumentList.jsx'
 import DocumentDetail from './DocumentDetail.jsx'
 
-// 기존 cognosFM-web의 DocumentList / DocumentDetail 을 그대로 재사용.
+// DocumentList / DocumentDetail 을 그대로 재사용.
 // Shell 내부의 content 영역에 렌더링됨.
 export default function Models() {
   const [view, setView] = useState('list')

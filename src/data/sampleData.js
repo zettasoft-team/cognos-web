@@ -8,7 +8,7 @@ export const TABS = [
 ]
 
 export const SAMPLE_DOCS = [
-  { id: 1, name: 'haksa_cognos_meta_v1.0.xml', uploadDate: '2025-04-07', status: 'ok' },
+  { id: 1, name: 'haksa_zmeta_meta_v1.0.xml', uploadDate: '2025-04-07', status: 'ok' },
   { id: 2, name: 'dw_meta_export_2025Q1.xml',  uploadDate: '2025-04-05', status: 'ok' },
   { id: 3, name: 'test_meta_draft.xml',         uploadDate: '2025-04-09', status: 'pending' },
 ]

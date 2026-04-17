@@ -12,13 +12,13 @@ export function getAccessToken() { return _accessToken }
 /** 토큰 세팅 (login/refresh 성공 시 호출) */
 export function setAccessToken(token) {
   _accessToken = token
-  window.__cognosfm_access_token = token // client.js 에서 참조
+  window.__zmeta_access_token = token // client.js 에서 참조
 }
 
 /** 토큰 제거 */
 export function clearAccessToken() {
   _accessToken = null
-  window.__cognosfm_access_token = null
+  window.__zmeta_access_token = null
 }
 
 // ── endpoints ───────────────────────────────────────────

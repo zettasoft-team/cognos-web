@@ -27,10 +27,10 @@ export default function Login({ onLogin }) {
     <div className="zt login-root">
       <div className="login-card card">
         <div className="login-brand">
-          <div className="sidebar-logo" style={{ width: 40, height: 40, fontSize: 18 }}>C</div>
+          <div className="sidebar-logo" style={{ width: 40, height: 40, fontSize: 18 }}>Z</div>
           <div>
-            <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em' }}>CognosFM</div>
-            <div className="muted" style={{ fontSize: 12 }}>Cognos BI 메타 관리 플랫폼</div>
+            <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em' }}>Zmeta</div>
+            <div className="muted" style={{ fontSize: 12 }}>메타 관리 플랫폼</div>
           </div>
         </div>
 

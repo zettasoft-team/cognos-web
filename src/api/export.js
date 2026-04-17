@@ -21,7 +21,7 @@ export const importExcel = (docId, file) => {
   return upload(`/api/documents/${docId}/import/excel`, form)
 }
 
-/** Cognos XML 재생성 다운로드 */
+/** Zmeta XML 재생성 다운로드 */
 export const exportXml = async (docId) => {
   const { blob, filename } = await download(`/api/documents/${docId}/export/xml`)
   triggerDownload(blob, filename)

@@ -2,7 +2,7 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000'
 
 /** auth.js 에서 토큰을 가져오기 위한 lazy import (순환 참조 방지) */
 function _getToken() {
-  try { return window.__cognosfm_access_token } catch { return null }
+  try { return window.__zmeta_access_token } catch { return null }
 }
 
 async function request(path, options = {}) {

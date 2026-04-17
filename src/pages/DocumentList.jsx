@@ -140,7 +140,7 @@ export default function DocumentList({ onOpen }) {
       <div className="page-header">
         <div className="page-header-top">
           <div>
-            <div className="page-title">Cognos BI 메타 문서 관리</div>
+            <div className="page-title">Zmeta 메타 문서 관리</div>
             <div className="page-subtitle">XML 업로드 · 테이블 편집 · XML 재생성 · ERD 시각화</div>
           </div>
           <div className="page-header-actions">
